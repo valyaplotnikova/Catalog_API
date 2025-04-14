@@ -57,4 +57,7 @@ class Settings(BaseSettings):
     db: DatabaseConfig
 
 
-settings = Settings()
+try:
+    settings = Settings()
+except Exception as e:
+    print(f"Error loading settings: {e}")
