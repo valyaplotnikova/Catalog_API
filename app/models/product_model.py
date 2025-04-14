@@ -4,17 +4,18 @@ from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.base import Base
+from models.properties_model import Property, PropertyValue
 
 
 class Product(Base):
-    __tablename__ = "Product"
+    __tablename__ = "products"
 
     uid: Mapped[str] = mapped_column(primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     name: Mapped[str] = mapped_column(nullable=False)
 
     # Связи с таблицами свойств
-    property_values: Mapped[list["ProductPropertyValue"]] = relationship(back_populates="product")
-    property_ints: Mapped[list["ProductPropertyInt"]] = relationship(back_populates="product")
+    property_values: Mapped[list["ProductPropertyValue"]] = relationship(back_populates="products")
+    property_ints: Mapped[list["ProductPropertyInt"]] = relationship(back_populates="products")
 
 
 class ProductPropertyValue(Base):
