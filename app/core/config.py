@@ -10,11 +10,25 @@ LOG_DEFAULT_FORMAT = (
 
 
 class RunConfig(BaseModel):
+    """
+    Конфигурация параметров запуска приложения.
+
+    Attributes:
+        host (str): Хост для запуска сервера (по умолчанию '0.0.0.0')
+        port (int): Порт для запуска сервера (по умолчанию 8000)
+    """
     host: str = "0.0.0.0"
     port: int = 8000
 
 
 class LoggingConfig(BaseModel):
+    """
+    Конфигурация логирования приложения.
+
+    Attributes:
+        log_level (Literal): Уровень логирования (debug, info, warning, error, critical)
+        log_format (str): Формат логов
+    """
     log_level: Literal[
         "debug",
         "info",
@@ -26,10 +40,22 @@ class LoggingConfig(BaseModel):
 
     @property
     def log_level_value(self) -> int:
+        """Возвращает числовое значение уровня логирования."""
         return logging.getLevelNamesMapping()[self.log_level.upper()]
 
 
 class DatabaseConfig(BaseModel):
+    """
+    Конфигурация подключения к базе данных.
+
+    Attributes:
+        url (PostgresDsn): URL подключения к БД
+        echo (bool): Логирование SQL запросов
+        echo_pool (bool): Логирование пула соединений
+        pool_size (int): Размер пула соединений
+        max_overflow (int): Максимальное переполнение пула
+        naming_convention (dict): Конвенции именования для SQLAlchemy
+    """
     url: PostgresDsn
     echo: bool = False
     echo_pool: bool = False
@@ -46,6 +72,11 @@ class DatabaseConfig(BaseModel):
 
 
 class Settings(BaseSettings):
+    """
+    Основные настройки приложения.
+
+    Загружает конфигурацию из .env файла с префиксом APP_CONFIG__.
+    """
     model_config = SettingsConfigDict(
         env_file=(".env",),
         case_sensitive=False,
@@ -57,4 +88,21 @@ class Settings(BaseSettings):
     db: DatabaseConfig
 
 
+def configure_logging(log_config: LoggingConfig):
+    """
+    Настраивает глобальное логирование для приложения.
+
+    Args:
+        log_config (LoggingConfig): Конфигурация логирования
+    """
+    logging.basicConfig(
+        level=log_config.log_level_value,
+        format=log_config.log_format,
+    )
+    logger = logging.getLogger(__name__)
+    logger.info("Логирование успешно настроено")
+
+
+# Инициализация настроек и логирования
 settings = Settings()
+configure_logging(settings.logging)
