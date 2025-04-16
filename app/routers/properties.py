@@ -19,19 +19,22 @@ async def add_property(property_data: Union[ListPropertyCreate, IntPropertyCreat
     crud = PropertyCRUD(session)
 
     try:
+
         if isinstance(property_data, ListPropertyCreate):
-            values = [v.dict(by_alias=True) for v in property_data.values]
             return await crud.create_property(
                 property_data.dict(exclude={"values"}),
-                values
+                [v.dict() for v in property_data.values]
             )
-        else:
-            return await crud.create_property(
-                property_data.dict(),
-                None
-            )
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+
+        return await crud.create_property(
+            property_data.dict(),
+            None
+        )
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(500, detail=str(e))
 
 
 @router.delete("/properties/{uid}")
@@ -43,3 +46,9 @@ async def delete_property(uid: UUID, session: Annotated[AsyncSession, Depends(db
         return {"response": "property delete"}
     except HTTPException as e:
         raise e
+
+
+@router.get("/properties/")
+async def get_list_properties(session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+    crud = PropertyCRUD(session)
+    return await crud.get_all_properties()

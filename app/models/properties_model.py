@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -18,8 +19,11 @@ class Property(Base):
     name: Mapped[str] = mapped_column(nullable=False)
     type: Mapped[str] = mapped_column(SqlAlchemyEnum("list", "int", name="property_type"), nullable=False)
 
-    # Связь со значениями списковых свойств
-    values: Mapped[list["PropertyValue"]] = relationship(back_populates="property")
+    values: Mapped[Optional[list["PropertyValue"]]] = relationship(
+        back_populates="property",
+        cascade="all, delete-orphan",
+        lazy="selectin"
+    )
 
 
 class PropertyValue(Base):
@@ -31,7 +35,7 @@ class PropertyValue(Base):
         index=True,
         default=uuid4
     )
-    property_uid: Mapped[str] = mapped_column(ForeignKey("properties.uid"), nullable=False)
+    property_uid: Mapped[str] = mapped_column(ForeignKey("properties.uid", ondelete="CASCADE"), nullable=False)
     value: Mapped[str] = mapped_column(nullable=False)
 
     # Связь с таблицей properties

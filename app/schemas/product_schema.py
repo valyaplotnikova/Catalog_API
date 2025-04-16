@@ -1,23 +1,22 @@
-from pydantic import BaseModel
-from typing import List, Union
+from uuid import UUID, uuid4
+
+from pydantic import BaseModel, UUID4, Field
+from typing import List, Optional
 
 
-class ProductProperty(BaseModel):
-    uid: str
+class PropertyValueRef(BaseModel):
+    uid: UUID4
+    value_uid: Optional[UUID4] = None
+    value: Optional[int] = None
+
+
+class ProductCreate(BaseModel):
+    uid: UUID = Field(default_factory=uuid4)
     name: str
-    value: Union[str, int]
-    value_uid: str | None = None
+    properties: List[PropertyValueRef]
 
 
-class ProductBase(BaseModel):
-    uid: str
-    name: str
-    properties: List[ProductProperty]
-
-
-class ProductCreate(ProductBase):
-    pass
-
-
-class ProductResponse(ProductBase):
-    pass
+class ProductResponse(ProductCreate):
+    class Config:
+        from_attributes = True
+        orm_mode = True

@@ -19,8 +19,8 @@ class Product(Base):
     name: Mapped[str] = mapped_column(nullable=False)
 
     # Связи с таблицами свойств
-    property_values: Mapped[list["ProductPropertyValue"]] = relationship(back_populates="products")
-    property_ints: Mapped[list["ProductPropertyInt"]] = relationship(back_populates="products")
+    property_values: Mapped[list["ProductPropertyValue"]] = relationship(back_populates="product")
+    property_ints: Mapped[list["ProductPropertyInt"]] = relationship(back_populates="product")
 
 
 class ProductPropertyValue(Base):
