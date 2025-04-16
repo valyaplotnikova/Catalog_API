@@ -4,14 +4,17 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI, APIRouter
 
-
 from core.config import settings
 
+from routers.properties import router as properties_router
+from routers.catalogs import router as catalog_router
+from routers.products import router as product_router
 
 logging.basicConfig(
     level=settings.logging.log_level_value,
     format=settings.logging.log_format,
 )
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[dict, None]:
@@ -52,6 +55,9 @@ def register_routers(app: FastAPI) -> None:
 
     # Подключение роутеров
     app.include_router(root_router, tags=["root"])
+    app.include_router(properties_router, tags=["properties"])
+    app.include_router(catalog_router, tags=["catalog"])
+    app.include_router(product_router, tags=["product"])
 
 
 # Создание экземпляра приложения
