@@ -1,7 +1,7 @@
-import uuid
+from uuid import UUID, uuid4
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from database.base import Base
 from sqlalchemy import Enum as SqlAlchemyEnum, ForeignKey
 
@@ -9,7 +9,12 @@ from sqlalchemy import Enum as SqlAlchemyEnum, ForeignKey
 class Property(Base):
     __tablename__ = "properties"
 
-    uid: Mapped[str] = mapped_column(primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    uid: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        index=True,
+        default=uuid4
+    )
     name: Mapped[str] = mapped_column(nullable=False)
     type: Mapped[str] = mapped_column(SqlAlchemyEnum("list", "int", name="property_type"), nullable=False)
 
@@ -20,7 +25,12 @@ class Property(Base):
 class PropertyValue(Base):
     __tablename__ = "property_values"
 
-    uid: Mapped[str] = mapped_column(primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    uid: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        index=True,
+        default=uuid4
+    )
     property_uid: Mapped[str] = mapped_column(ForeignKey("properties.uid"), nullable=False)
     value: Mapped[str] = mapped_column(nullable=False)
 
