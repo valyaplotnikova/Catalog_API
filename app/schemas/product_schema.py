@@ -1,6 +1,6 @@
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, UUID4, Field
+from pydantic import BaseModel, UUID4, Field, ConfigDict
 from typing import List, Optional
 
 
@@ -11,12 +11,11 @@ class PropertyValueRef(BaseModel):
 
 
 class ProductCreate(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     uid: UUID = Field(default_factory=uuid4)
     name: str
     properties: List[PropertyValueRef]
 
 
-class ProductResponse(ProductCreate):
-    class Config:
-        from_attributes = True
-        orm_mode = True
+

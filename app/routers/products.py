@@ -6,16 +6,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.products_crud import ProductCRUD
 from database.database import db_helper
-from schemas.product_schema import ProductCreate, ProductResponse
+from schemas.product_schema import ProductCreate
+from utils import product_to_response
 
 router = APIRouter()
 
 
-@router.get("/product/{uid}")
+@router.get("/product/{uid}", response_model_exclude_none=True)
 async def get_product(session: Annotated[AsyncSession, Depends(db_helper.session_getter)], product_uid: UUID):
     crud = ProductCRUD(session)
     product = await crud.get_product(product_uid)
-    return ProductResponse.from_orm(product)
+    return product_to_response(product)
 
 
 @router.post("/product/")
