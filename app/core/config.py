@@ -17,6 +17,7 @@ class RunConfig(BaseModel):
         host (str): Хост для запуска сервера (по умолчанию '0.0.0.0')
         port (int): Порт для запуска сервера (по умолчанию 8000)
     """
+
     host: str = "0.0.0.0"
     port: int = 8000
 
@@ -29,6 +30,7 @@ class LoggingConfig(BaseModel):
         log_level (Literal): Уровень логирования (debug, info, warning, error, critical)
         log_format (str): Формат логов
     """
+
     log_level: Literal[
         "debug",
         "info",
@@ -56,6 +58,7 @@ class DatabaseConfig(BaseModel):
         max_overflow (int): Максимальное переполнение пула
         naming_convention (dict): Конвенции именования для SQLAlchemy
     """
+
     url: PostgresDsn
     echo: bool = False
     echo_pool: bool = False
@@ -77,6 +80,7 @@ class Settings(BaseSettings):
 
     Загружает конфигурацию из .env файла с префиксом APP_CONFIG__.
     """
+
     model_config = SettingsConfigDict(
         env_file=(".env",),
         case_sensitive=False,
@@ -99,6 +103,7 @@ def configure_logging(log_config: LoggingConfig):
         level=log_config.log_level_value,
         format=log_config.log_format,
     )
+    logging.getLogger("sqlalchemy.engine.Engine").disabled = True
     logger = logging.getLogger(__name__)
     logger.info("Логирование успешно настроено")
 

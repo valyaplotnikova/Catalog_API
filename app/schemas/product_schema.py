@@ -16,6 +16,3 @@ class ProductCreate(BaseModel):
     uid: UUID = Field(default_factory=uuid4)
     name: str
     properties: List[PropertyValueRef]
-
-
-

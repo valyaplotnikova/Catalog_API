@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, List
+from typing import Optional, Sequence
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 import sqlalchemy as sa
@@ -17,27 +17,24 @@ class PropertyCRUD:
         self.session = session
 
     async def create_property(
-            self,
-            property_data: dict,
-            values: Optional[list[dict]] = None
+        self, property_data: dict, values: Optional[list[dict]] = None
     ) -> Property:
         """Создание нового свойства"""
 
         logger.info(f"Создание записи Property с данными: {property_data}")
 
         try:
-            if property_data['type'] == 'list' and not values:
+            if property_data["type"] == "list" and not values:
                 raise ValueError("Для свойства типа 'list' необходимо указать values")
-            if property_data['type'] == 'int' and values:
+            if property_data["type"] == "int" and values:
                 raise ValueError("Для свойства типа 'int' не должно быть values")
 
             db_property = Property(**property_data)
 
-            if property_data['type'] == 'list' and values:
+            if property_data["type"] == "list" and values:
                 db_property.values = [
                     PropertyValue(
-                        uid=value_data['value_uid'],
-                        value=value_data['value']
+                        uid=value_data["value_uid"], value=value_data["value"]
                     )
                     for value_data in values
                 ]
@@ -54,7 +51,10 @@ class PropertyCRUD:
         except Exception as e:
             logger.error(f"Ошибка создания записи {str(e)}")
             await self.session.rollback()
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Database error: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Database error: {str(e)}",
+            )
 
     async def get_property(self, uid: UUID) -> Property:
         """Получение свойства по UUID"""
@@ -64,8 +64,7 @@ class PropertyCRUD:
         if not result:
             logger.error(f"Cвойство: {uid} не найдено")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Property not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Property not found"
             )
         return result
 
@@ -78,14 +77,13 @@ class PropertyCRUD:
         if result.rowcount == 0:
             logger.error(f"Cвойство: {uid} не найдено")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Property not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Property not found"
             )
         await self.session.commit()
 
-    async def get_all_properties(self) -> List[Property]:
+    async def get_all_properties(self) -> Sequence[Property]:
         """Получение всех свойств с их значениями (для типа 'list')"""
         logger.info("Получение всех свойств")
-        stmt = (sa.select(Property).options(selectinload(Property.values)))
+        stmt = sa.select(Property).options(selectinload(Property.values))
         result = await self.session.execute(stmt)
         return result.scalars().unique().all()

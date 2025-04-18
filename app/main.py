@@ -26,11 +26,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[dict, None]:
 
 def create_app() -> FastAPI:
     """
-   Создание и конфигурация FastAPI приложения.
+    Создание и конфигурация FastAPI приложения.
 
-   Returns:
-       Сконфигурированное приложение FastAPI
-   """
+    Returns:
+        Сконфигурированное приложение FastAPI
+    """
     app = FastAPI(
         title="Catalog-API",
         lifespan=lifespan,

@@ -13,21 +13,30 @@ router = APIRouter()
 
 
 @router.get("/product/{uid}", response_model_exclude_none=True)
-async def get_product(session: Annotated[AsyncSession, Depends(db_helper.session_getter)], product_uid: UUID):
+async def get_product(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    product_uid: UUID,
+):
     crud = ProductCRUD(session)
     product = await crud.get_product(product_uid)
     return product_to_response(product)
 
 
 @router.post("/product/")
-async def add_product(product_data: ProductCreate, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+async def add_product(
+    product_data: ProductCreate,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+):
     crud = ProductCRUD(session)
     product = await crud.create_product(product_data)
     return product
 
 
 @router.delete("/product/{uid}")
-async def delete_product(session: Annotated[AsyncSession, Depends(db_helper.session_getter)], product_uid: UUID):
+async def delete_product(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    product_uid: UUID,
+):
     crud = ProductCRUD(session)
     try:
         await crud.delete_product(product_uid)

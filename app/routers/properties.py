@@ -13,8 +13,10 @@ router = APIRouter()
 
 
 @router.post("/properties/")
-async def add_property(property_data: Union[ListPropertyCreate, IntPropertyCreate],
-                       session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+async def add_property(
+    property_data: Union[ListPropertyCreate, IntPropertyCreate],
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+):
     """Создание нового свойства"""
     crud = PropertyCRUD(session)
 
@@ -23,13 +25,10 @@ async def add_property(property_data: Union[ListPropertyCreate, IntPropertyCreat
         if isinstance(property_data, ListPropertyCreate):
             return await crud.create_property(
                 property_data.dict(exclude={"values"}),
-                [v.dict() for v in property_data.values]
+                [v.dict() for v in property_data.values],
             )
 
-        return await crud.create_property(
-            property_data.dict(),
-            None
-        )
+        return await crud.create_property(property_data.dict(), None)
 
     except HTTPException as e:
         raise e
@@ -38,7 +37,9 @@ async def add_property(property_data: Union[ListPropertyCreate, IntPropertyCreat
 
 
 @router.delete("/properties/{uid}")
-async def delete_property(uid: UUID, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+async def delete_property(
+    uid: UUID, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+):
     """Удаление свойства"""
     crud = PropertyCRUD(session)
     try:
@@ -49,6 +50,8 @@ async def delete_property(uid: UUID, session: Annotated[AsyncSession, Depends(db
 
 
 @router.get("/properties/")
-async def get_list_properties(session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+async def get_list_properties(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+):
     crud = PropertyCRUD(session)
     return await crud.get_all_properties()
